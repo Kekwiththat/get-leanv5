@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Get Lean</title>
+<link rel="manifest" href="manifest.json">
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<style>
+body{font-family:Arial;margin:0;background:#f4f6f8;}
+header{background:#007AFF;color:white;padding:18px;font-size:22px;text-align:center;}
+nav{display:flex;justify-content:space-around;background:white;border-bottom:1px solid #ddd;padding:8px;}
+nav button{border:none;background:none;font-size:12px;}
+.section{display:none;padding:20px;}
+.active{display:block;}
+.card{background:white;padding:18px;margin-bottom:15px;border-radius:10px;box-shadow:0 2px 8px rgba(0,0,0,.08);}
+button.action{background:#007AFF;color:white;border:none;padding:8px 12px;border-radius:6px;margin-top:6px;}
+input{padding:6px;margin:4px;width:100px;}
+.ring{width:90px;height:90px;border-radius:50%;border:8px solid #eee;display:inline-block;margin:8px;text-align:center;line-height:72px;font-size:14px;}
+.streak{font-size:16px;font-weight:bold;color:#007AFF;}
+canvas{max-width:100%;height:200px;margin-top:8px;}
+</style>
+</head>
+<body>
+
+<header>Get Lean</header>
+
+<nav>
+<button onclick="tab('dashboard')">Dashboard</button>
+<button onclick="tab('nutrition')">Nutrition</button>
+<button onclick="tab('workouts')">Workouts</button>
+<button onclick="tab('trackers')">Trackers</button>
+<button onclick="tab('progress')">Progress</button>
+<button onclick="tab('tools')">Tools</button>
+<button onclick="tab('settings')">Settings</button>
+</nav>
+
+<!-- DASHBOARD -->
+<div id="dashboard" class="section active">
+<div class="card">
+<h3>Daily Motivation</h3>
+<p id="motivation"></p>
+</div>
+
+<div class="card">
+<h3>Program Timer</h3>
+Start Date <input type="date" id="startDate">
+<button class="action" onclick="startProgram()">Start</button>
+<p id="dayDisplay"></p>
+</div>
+
+<div class="card">
+<h3>Activity Rings</h3>
+<div class="ring" id="calRing">0</div>
+<div class="ring" id="waterRing">0</div>
+<div class="ring" id="stepRing">0</div>
+</div>
+
+<div class="card">
+<h3>Streaks</h3>
+<p class="streak" id="streaks">0 days completed</p>
+<button class="action" onclick="completeDay()">Complete Today</button>
+</div>
+</div>
+
+<!-- NUTRITION -->
+<div id="nutrition" class="section">
+<div class="card">
+<h3>Meal Tracker</h3>
+Chicken (oz)<input id="chicken">
+Brown Rice (cups)<input id="brownRice">
+Broccoli (cups)<input id="broccoli">
+Juice Calories<input id="juice">
+Custom Calories<input id="custom">
+<br>
+<button class="action" onclick="addMeal()">Add Meal</button>
+<p id="calories">Calories: 0</p>
+<canvas id="caloriesChart"></canvas>
+</div>
+
+<div class="card">
+<h3>Water Tracker</h3>
+<span id="water">0</span>/16 glasses<br>
+<button class="action" onclick="addWater()">Add</button>
+<button class="action" onclick="removeWater()">Remove</button>
+<button class="action" onclick="resetWater()">Reset</button>
+<canvas id="waterChart"></canvas>
+</div>
+
+<div class="card">
+<h3>Water Schedule</h3>
+7AM 8AM 9AM 10AM 11AM 12PM 1PM 2PM 3PM 4PM 5PM 6PM 7PM 8PM 9PM 10PM
+</div>
+</div>
+
+<!-- WORKOUTS -->
+<div id="workouts" class="section">
+<div class="card">
+<h3>10-Minute Home Workout</h3>
+<ul>
+<li>Push-ups x 30 sec</li>
+<li>Squats x 30 sec</li>
+<li>Jumping Jacks x 30 sec</li>
+<li>Plank x 30 sec</li>
+<li>Rest 30 sec</li>
+<li>Repeat 2 rounds</li>
+</ul>
+<progress id="workoutTimerBar" max="600" value="0"></progress><br>
+<button class="action" onclick="startWorkout()">Start</button>
+<button class="action" onclick="stopWorkout()">Stop</button>
+<button class="action" onclick="resetWorkout()">Reset</button>
+<p id="timer"></p>
+</div>
+
+<div class="card">
+<h3>Gym Workout Plan (Mon-Sat)</h3>
+<ul id="gymPlanList"></ul>
+</div>
+</div>
+
+<!-- TRACKERS -->
+<div id="trackers" class="section">
+<div class="card">
+<h3>Weight Tracker</h3>
+<input id="weightInput">
+<button class="action" onclick="addWeight()">Add</button>
+<p id="weightList"></p>
+<canvas id="weightChart"></canvas>
+</div>
+
+<div class="card">
+<h3>Steps Tracker</h3>
+<input id="steps">
+<button class="action" onclick="updateSteps()">Update</button>
+<p id="stepsDisplay"></p>
+<canvas id="stepsChart"></canvas>
+</div>
+
+<div class="card">
+<h3>Body Fat Tracker</h3>
+<input id="bodyfat">
+<button class="action" onclick="saveBodyFat()">Save</button>
+<p id="bfList"></p>
+</div>
+
+<div class="card">
+<h3>BMI Calculator</h3>
+Height(in)<input id="height">
+Weight(lbs)<input id="bmiWeight">
+<button class="action" onclick="calcBMI()">Calculate</button>
+<p id="bmi"></p>
+</div>
+</div>
+
+<!-- PROGRESS -->
+<div id="progress" class="section">
+<div class="card">
+<h3>Weight Progress Chart</h3>
+<canvas id="progressChart"></canvas>
+</div>
+</div>
+
+<!-- TOOLS -->
+<div id="tools" class="section">
+<div class="card">
+<h3>Fat Loss Simulator</h3>
+Current Weight<input id="currentWeight">
+Goal Weight<input id="goalWeight">
+Program Days<input id="programDays" value="42">
+<button class="action" onclick="simulate()">Calculate</button>
+<p id="result"></p>
+<canvas id="weightSimChart"></canvas>
+</div>
+
+<div class="card">
+<h3>Macro Calculator</h3>
+Calories<input id="macroCalories">
+<button class="action" onclick="calcMacros()">Calculate</button>
+<p id="macroResult"></p>
+</div>
+
+<div class="card">
+<h3>Meal Plan Generator</h3>
+Calories<input id="planCalories" value="1750">
+<button class="action" onclick="mealPlan()">Generate</button>
+<p id="plan"></p>
+</div>
+</div>
+
+<!-- SETTINGS -->
+<div id="settings" class="section">
+<div class="card">
+<h3>Enable Notifications</h3>
+<button class="action" onclick="enableNotifications()">Enable</button>
+</div>
+</div>
+
+<script src="getlean-functions.js"></script>
+</body>
+</html>
